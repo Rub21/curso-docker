@@ -1,0 +1,43 @@
+services:
+  # Ejemplo 1: Bind mount para desarrollo
+  app-dev:
+    image: python:3.9-slim
+    volumes:
+      - ./data:/data
+      - ./scripts:/scripts
+    command: python /scripts/app.py
+    networks:
+      - app-network
+
+  # Ejemplo 2: Named volume para base de datos
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mi_app
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Ejemplo 3: Múltiples volúmenes
+  app-with-volumes:
+    image: nginx:alpine
+    volumes:
+      - ./html:/usr/share/nginx/html:ro  # Bind mount read-only
+      - nginx-cache:/var/cache/nginx     # Named volume
+      - nginx-logs:/var/log/nginx        # Named volume para logs
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:
+  nginx-cache:
+  nginx-logs:
+
+networks:
+  app-network:
+    driver: bridge
+
